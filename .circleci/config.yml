@@ -17,7 +17,7 @@ jobs:
           command: yarn install
 
       - run:
-          command: yarn lint .
+          command: yarn lint
 
       - run:
           command: yarn build
