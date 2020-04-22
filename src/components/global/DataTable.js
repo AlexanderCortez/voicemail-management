@@ -75,6 +75,7 @@ const getTableBody = (data, columns, keyId, count) => {
           const key = index;
           return (
             <TableCell
+              style={column.style || {}}
               key={key}
             >
               {getCellContent(row, column, index)}

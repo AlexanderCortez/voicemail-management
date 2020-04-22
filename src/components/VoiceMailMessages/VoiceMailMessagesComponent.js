@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { Box } from '@material-ui/core';
+import { Box, Button } from '@material-ui/core';
+import styled from 'styled-components';
+import { ArrowBackIos } from '@material-ui/icons';
 import Navbar from '../global/Navbar';
 import VoiceMailTable from './VoiceMailTable';
 import SnackBar from '../global/SnackBar';
+import { goTo } from '../../actions/AppActions';
 
 const styles = {
   box: {
@@ -25,8 +28,18 @@ class VoiceMailMessagesComponent extends Component {
   }
 
   componentDidMount() {
-    const { fetchMessages } = this.props;
-    fetchMessages()
+    const {
+      fetchMessages,
+      getVoiceMailBoxes,
+      setCurrentVoiceMailBox,
+      match,
+    } = this.props;
+    getVoiceMailBoxes()
+      .then(() => {
+        const vmBoxId = get(match.params, 'vmBoxId', '');
+        setCurrentVoiceMailBox(vmBoxId);
+        return fetchMessages();
+      })
       .then(() => {
         this.handleSnackbarContent('success', 'Messages retrieved');
       })
@@ -66,18 +79,47 @@ class VoiceMailMessagesComponent extends Component {
     }));
   }
 
+  goToRoot = () => {
+    const { history } = this.props;
+    goTo(history, '/');
+  }
+
+  getHeaderTitle = () => {
+    const { currentVoiceMailBox } = this.props;
+    if (currentVoiceMailBox && currentVoiceMailBox.name) {
+      return `${currentVoiceMailBox.name} - Messages`;
+    }
+    return '';
+  }
+
   render() {
     const { snackbar } = this.state;
-    const { messages, loadingFetch, statusChange } = this.props;
+    const {
+      messages, loadingFetch, statusChange,
+    } = this.props;
+    const title = this.getHeaderTitle();
     return (
       <div>
         <Navbar
-          title="VoiceMail Messages"
+          title={title}
         />
         <Box
           component="div"
           style={styles.box}
         >
+          <BackWardWrapper>
+            {
+              !loadingFetch
+                && (
+                  <Button
+                    onClick={this.goToRoot}
+                  >
+                    <ArrowBackIos />
+                    <span>Go to VoiceMail Boxes List</span>
+                  </Button>
+                )
+            }
+          </BackWardWrapper>
           <VoiceMailTable
             data={messages}
             loading={loadingFetch}
@@ -99,9 +141,24 @@ class VoiceMailMessagesComponent extends Component {
 VoiceMailMessagesComponent.propTypes = {
   fetchMessages: PropTypes.func.isRequired,
   changeMessageStatus: PropTypes.func.isRequired,
+  setCurrentVoiceMailBox: PropTypes.func.isRequired,
+  getVoiceMailBoxes: PropTypes.func.isRequired,
   messages: PropTypes.instanceOf(Array).isRequired,
   loadingFetch: PropTypes.bool.isRequired,
   statusChange: PropTypes.instanceOf(Object).isRequired,
+  history: PropTypes.instanceOf(Object).isRequired,
+  match: PropTypes.instanceOf(Object).isRequired,
+  currentVoiceMailBox: PropTypes.instanceOf(Object).isRequired,
 };
+
+const BackWardWrapper = styled.div`
+  height: 50px;
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  * {
+    text-transform: none !important;
+  }
+`;
 
 export default VoiceMailMessagesComponent;
