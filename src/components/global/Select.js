@@ -1,5 +1,7 @@
 import React from 'react';
-import { Select, InputBase, MenuItem, CircularProgress } from '@material-ui/core';
+import {
+  Select, InputBase, MenuItem, CircularProgress,
+} from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { uniqueId } from 'lodash';
 import PropTypes from 'prop-types';
@@ -46,33 +48,31 @@ const SelectComponent = ({
   options,
   loading,
   style,
-}) => {
-  return (
-    <Select
-      style={style}
-      value={currentValue}
-      onChange={(event) => {
-        if (!loading && handleChange) {
-          handleChange(event);
-        }
-      }}
-      input={<Input />}
-      disabled={loading}
-    >
-      {
-        options.map((option) => (
-          <MenuItem
-            value={option.value}
-            key={uniqueId()}
-          >
-            {loading && getLoaderInCurrentValue(currentValue, option.value)}
-            {option.label}
-          </MenuItem>
-        ))
+}) => (
+  <Select
+    style={style}
+    value={currentValue}
+    onChange={(event) => {
+      if (!loading && handleChange) {
+        handleChange(event);
       }
-    </Select>
-  );
-};
+    }}
+    input={<Input />}
+    disabled={loading}
+  >
+    {
+      options.map((option) => (
+        <MenuItem
+          value={option.value}
+          key={uniqueId()}
+        >
+          {loading && getLoaderInCurrentValue(currentValue, option.value)}
+          {option.label}
+        </MenuItem>
+      ))
+    }
+  </Select>
+);
 
 SelectComponent.propTypes = {
   currentValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
