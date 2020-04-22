@@ -1,12 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import axios from 'axios';
 import './index.css';
 import App from './App';
+import store from './store';
 import * as serviceWorker from './serviceWorker';
+
+const { NODE_ENV } = process.env;
+
+axios.defaults.baseURL = NODE_ENV !== 'production' ? 'http://localhost:3001' : '';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root'),
 );
