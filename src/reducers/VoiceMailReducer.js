@@ -6,20 +6,31 @@ import {
   LOADING_CHANGE_MESSAGE_STATUS,
   STOP_CHANGE_MESSAGE_STATUS,
   SUCCESS_CHANGE_MESSAGE_STATUS,
+  SET_CURRENT_VOICEMAIL_BOX,
 } from '../actionTypes/VoiceMailTypes';
 
 const initialState = {
   messages: {},
-  loadingFetch: false,
+  loadingFetch: true,
   statusChange: {},
+  currentVoiceMailBox: {},
 };
 
 const VoiceMailReducer = (state = initialState, action) => {
   const { type, payload } = action;
+  if (type === SET_CURRENT_VOICEMAIL_BOX) {
+    return {
+      ...state,
+      currentVoiceMailBox: payload,
+    };
+  }
   if (type === FETCH_MESSAGES) {
     return {
       ...state,
-      messages: payload,
+      messages: {
+        ...state.messages,
+        [payload.vmBoxId]: payload.messages,
+      },
     };
   }
   if (type === LOADING_FETCH_MESSAGES) {
@@ -57,12 +68,15 @@ const VoiceMailReducer = (state = initialState, action) => {
     };
   }
   if (type === SUCCESS_CHANGE_MESSAGE_STATUS) {
-    const messageId = get(payload, 'media_id');
+    const messageId = get(payload.data, 'media_id');
     return {
       ...state,
       messages: {
         ...state.messages,
-        [messageId]: payload,
+        [payload.vmBoxId]: {
+          ...state.messages[payload.vmBoxId],
+          [messageId]: payload.data,
+        },
       },
     };
   }
