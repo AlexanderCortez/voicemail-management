@@ -39,7 +39,7 @@ export const changeMessageStatus = (messageId, status) => (dispatch, getState) =
   const vmBoxId = currentVoiceMailBox.id;
   dispatch(getAction(LOADING_CHANGE_MESSAGE_STATUS, messageId));
   return axios
-    .patch(`api/accounts/vmboxes/${vmBoxId}/messages/${messageId}/changeStatus`, { status })
+    .patch(`/api/accounts/vmboxes/${vmBoxId}/messages/${messageId}/changeStatus`, { status })
     .then((response) => {
       dispatch(getAction(STOP_CHANGE_MESSAGE_STATUS, messageId));
       const { data } = response;
