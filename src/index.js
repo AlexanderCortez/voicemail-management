@@ -7,10 +7,9 @@ import App from './App';
 import store from './store';
 import * as serviceWorker from './serviceWorker';
 
-const { REACT_APP_CREDENTIALS } = process.env;
+const { NODE_ENV } = process.env;
 
-axios.defaults.baseURL = 'https://sandbox.2600hz.com:8443/v2';
-axios.defaults.headers.common.Authorization = `Basic ${REACT_APP_CREDENTIALS}`;
+axios.defaults.baseURL = NODE_ENV !== 'production' ? 'http://localhost:3001' : '';
 
 ReactDOM.render(
   <React.StrictMode>

@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import { values } from 'lodash';
 import { fetchMessages } from '../../actions/VoiceMailActions';
 import VoiceMailMessagesComponent from './VoiceMailMessagesComponent';
 
@@ -7,7 +8,7 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const mapStateToProps = (state) => ({
-  data: state.VoiceMailReducer.messages,
+  messages: values(state.VoiceMailReducer.messages),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(VoiceMailMessagesComponent);
