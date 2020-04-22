@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 import { Box } from '@material-ui/core';
 import Navbar from '../global/Navbar';
 import VoiceMailTable from './VoiceMailTable';
@@ -15,7 +16,6 @@ class VoiceMailMessagesComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loadingFetch: false,
       snackbar: {
         type: 'success',
         text: '',
@@ -26,27 +26,34 @@ class VoiceMailMessagesComponent extends Component {
 
   componentDidMount() {
     const { fetchMessages } = this.props;
-    this.setState({ loadingFetch: true });
     fetchMessages()
       .then(() => {
-        this.setState({
-          loadingFetch: false,
-          snackbar: {
-            type: 'success',
-            text: 'Messages retrieved',
-            open: true,
-          },
-        });
+        this.handleSnackbarContent('success', 'Messages retrieved');
       })
       .catch(() => {
-        this.setState({
-          loadingFetch: false,
-          snackbar: {
-            type: 'error',
-            text: 'Error retrieving messages',
-            open: true,
-          },
-        });
+        this.handleSnackbarContent('error', 'Error retrieving messages');
+      });
+  }
+
+  handleSnackbarContent = (type, message) => {
+    this.setState({
+      snackbar: {
+        type,
+        text: message,
+        open: true,
+      },
+    });
+  }
+
+  handleStatusChange = (data, status) => {
+    const { changeMessageStatus } = this.props;
+    const messageId = get(data, 'media_id');
+    changeMessageStatus(messageId, status)
+      .then(() => {
+        this.handleSnackbarContent('success', 'Message status successfully');
+      })
+      .catch(() => {
+        this.handleSnackbarContent('error', 'Error changing status');
       });
   }
 
@@ -60,8 +67,8 @@ class VoiceMailMessagesComponent extends Component {
   }
 
   render() {
-    const { messages } = this.props;
-    const { loadingFetch, snackbar } = this.state;
+    const { snackbar } = this.state;
+    const { messages, loadingFetch, statusChange } = this.props;
     return (
       <div>
         <Navbar
@@ -74,6 +81,8 @@ class VoiceMailMessagesComponent extends Component {
           <VoiceMailTable
             data={messages}
             loading={loadingFetch}
+            handleStatusChange={this.handleStatusChange}
+            statusChange={statusChange}
           />
         </Box>
         <SnackBar
@@ -89,7 +98,10 @@ class VoiceMailMessagesComponent extends Component {
 
 VoiceMailMessagesComponent.propTypes = {
   fetchMessages: PropTypes.func.isRequired,
+  changeMessageStatus: PropTypes.func.isRequired,
   messages: PropTypes.instanceOf(Array).isRequired,
+  loadingFetch: PropTypes.bool.isRequired,
+  statusChange: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default VoiceMailMessagesComponent;
